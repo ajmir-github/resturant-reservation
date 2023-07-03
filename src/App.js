@@ -1,10 +1,22 @@
-import { run, test } from "./firebase";
+import Reservations from "./components/reservations";
+import MakeReservation from "./components/makeReservation";
+
+function jsDateToHtml(date) {
+  const isoString = date.toISOString();
+  return isoString.substring(0, isoString.indexOf("T") + 6);
+}
+
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">Learn React</header>
-      <button onClick={run}>Run</button>
-      <button onClick={test}>Test</button>
+    <div className="flex flex-col p-2 gap-2">
+      <input
+        type="datetime-local"
+        name={"date"}
+        className="input w-full input-bordered input-primary input-sm"
+        defaultValue={jsDateToHtml(new Date())}
+      />
+      <Reservations />
+      <MakeReservation />
     </div>
   );
 }
