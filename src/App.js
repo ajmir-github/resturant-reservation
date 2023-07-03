@@ -1,6 +1,5 @@
 import Reservations from "./components/reservations";
 import MakeReservation from "./components/makeReservation";
-import { convertjsDateToHtml } from "./firebase";
 
 function App() {
   return (
@@ -9,7 +8,6 @@ function App() {
         type="date"
         name={"date"}
         className="input w-full input-bordered input-primary input-sm"
-        // defaultValue={convertjsDateToHtml(new Date())}
       />
       <Reservations />
       <MakeReservation />

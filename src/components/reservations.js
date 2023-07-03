@@ -13,7 +13,8 @@ export default function Reservations() {
   const [reservations, setReservations] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = trackChanges(setReservations);
+    // const unsubscribe = trackChanges(setReservations);
+    trackChanges(setReservations);
 
     // return () => unsubscribe();
   }, []);
