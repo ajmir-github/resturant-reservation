@@ -8,27 +8,35 @@ import {
   onSnapshot,
   setDoc,
 } from "firebase/firestore";
+import { timestampToJsDate } from "./dateConvertor";
 
 const reservationColName = "reservations";
 
 // reservation onbject
 // id, date, name, persons, table, specialRequest
 
-const reservationRef = collection(database, reservationColName);
-
-async function getReservations() {
-  const snap = await getDocs(reservationRef);
-  const reservations = snap.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
-  return reservations;
+function normalizeFirebaseDoc(doc) {
+  const id = doc.id;
+  const data = doc.data();
+  const dateTime = timestampToJsDate(data.dateTime);
+  return {
+    ...data,
+    id,
+    dateTime,
+  };
 }
 
-async function createReservation(reservation) {
+const reservationRef = collection(database, reservationColName);
+
+export async function getReservations() {
+  const snap = await getDocs(reservationRef);
+  return snap.docs.map(normalizeFirebaseDoc);
+}
+
+export async function createReservation(reservation) {
   const ref = doc(reservationRef);
   await setDoc(ref, reservation);
-  console.log("Reservations added!");
+  return "Reservations added!";
 }
 
 async function updateReservation(id, entries, merge = true) {
@@ -43,11 +51,11 @@ async function deleteReservation(id) {
   console.log("Reservation deleted!");
 }
 
-async function trackChanges(onChange) {
+export async function trackChanges(onChange) {
   const unsubscribe = onSnapshot(reservationRef, (querySnapshot) => {
     const reservations = [];
     querySnapshot.forEach((doc) => {
-      reservations.push({ id: doc.id, ...doc.data() });
+      reservations.push(normalizeFirebaseDoc(doc));
     });
     onChange(reservations);
   });

@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { trackChanges } from "../firebase";
+import { jsToLocalStringTime } from "../firebase/dateConvertor";
 
 const FILTER = {
   all: 1,
@@ -8,47 +10,31 @@ const FILTER = {
 
 export default function Reservations() {
   const [filter, setFilter] = useState(FILTER.all);
-  const reservations = [
-    {
-      id: "asdasd",
-      time: "8:30",
-      persons: 3,
-      name: "Cy Ganderton",
-      table: "22",
-      specialRequest: "Birthday",
-      phoneNumber: "+357-329832-234",
-      taken: false,
-    },
-    {
-      id: "wfe",
-      time: "8:30",
-      persons: 8,
-      name: "Hart Hagerty",
-      table: "22",
-      phoneNumber: "+357-329832-234",
-      taken: false,
-    },
-    {
-      id: "f324f",
-      time: "8:30",
-      persons: 2,
-      name: "Brice Swyre",
-      table: "22",
-      specialRequest: "Birthday",
-      taken: false,
-    },
-    {
-      id: "trh",
-      time: "8:30",
-      persons: 2,
-      name: "Andreas Kara",
-      table: "22",
-      taken: true,
-    },
-  ];
+  const [reservations, setReservations] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = trackChanges(setReservations);
+
+    // return () => unsubscribe();
+  }, []);
+
   const changeStatus = (id, taken) => {
     console.log({ id, taken });
   };
+
+  const filterFuc = ({ taken }) => {
+    if (filter === FILTER.all) return true;
+    if (filter === FILTER.taken && taken) return true;
+    if (filter === FILTER.pending && !taken) return true;
+    return false;
+  };
+
+  const sortFunc = (a, b) => {
+    const aDate = new Date(a.dateTime);
+    const bDate = new Date(b.dateTime);
+    return bDate - aDate;
+  };
+
   return (
     <div className="flex flex-col gap-2">
       {/* Filter the reservations */}
@@ -92,12 +78,8 @@ export default function Reservations() {
           </thead>
           <tbody>
             {reservations
-              .filter(({ taken }) => {
-                if (filter === FILTER.all) return true;
-                if (filter === FILTER.taken && taken) return true;
-                if (filter === FILTER.pending && !taken) return true;
-                return false;
-              })
+              .filter(filterFuc)
+              .sort(sortFunc)
               .map((reservation) => (
                 <tr
                   key={reservation.id}
@@ -111,7 +93,7 @@ export default function Reservations() {
                     changeStatus(reservation.id, reservation.taken)
                   }
                 >
-                  <th>{reservation.time}</th>
+                  <th>{jsToLocalStringTime(reservation.dateTime)}</th>
                   <th>{reservation.persons}</th>
                   <td>{reservation.name}</td>
                   <td>{reservation.table}</td>

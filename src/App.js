@@ -1,10 +1,6 @@
 import Reservations from "./components/reservations";
 import MakeReservation from "./components/makeReservation";
-
-function jsDateToHtml(date) {
-  const isoString = date.toISOString();
-  return isoString.substring(0, isoString.indexOf("T") + 6);
-}
+import { convertjsDateToHtml } from "./firebase";
 
 function App() {
   return (
@@ -13,7 +9,7 @@ function App() {
         type="datetime-local"
         name={"date"}
         className="input w-full input-bordered input-primary input-sm"
-        defaultValue={jsDateToHtml(new Date())}
+        // defaultValue={convertjsDateToHtml(new Date())}
       />
       <Reservations />
       <MakeReservation />

@@ -1,5 +1,9 @@
+import { useState } from "react";
+import { createReservation } from "../firebase";
+import { HTMLDateTimeToFirebase } from "../firebase/dateConvertor";
+
 const INPUTS = {
-  dateAndTime: "dataAndTime",
+  dateTime: "dateTime",
   persons: "persons",
   name: "name",
   table: "table",
@@ -7,8 +11,40 @@ const INPUTS = {
   phoneNumber: "phoneNumber",
 };
 export default function MakeReservation() {
+  const [message, setMessage] = useState(null);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const reservation = {
+      dateTime: HTMLDateTimeToFirebase(form.get(INPUTS.dateTime)),
+      persons: form.get(INPUTS.persons),
+      table: form.get(INPUTS.table),
+      name: form.get(INPUTS.name),
+      specialRequest: form.get(INPUTS.specialRequest),
+      phoneNumber: form.get(INPUTS.phoneNumber),
+      taken: false,
+    };
+
+    createReservation(reservation).then((res) => {
+      setMessage(res);
+      window.make_reservation_modal.close();
+      setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+    });
+  };
+
   return (
     <div>
+      {/* added toast */}
+      {message && (
+        <div className="toast toast-start">
+          <div className="alert alert-success">
+            <span>{message}</span>
+          </div>
+        </div>
+      )}
+
       {/* Make a reservation */}
       <button
         className="btn btn-circle bg-primary absolute bottom-0 right-0 m-5"
@@ -17,7 +53,7 @@ export default function MakeReservation() {
         Add
       </button>
       <dialog id="make_reservation_modal" className="modal">
-        <form method="dialog" className="modal-box">
+        <form method="dialog" className="modal-box" onSubmit={handleSubmit}>
           <h3 className="font-bold text-lg">Make Reservations</h3>
           <div className="py-2">
             <div className="form-control w-full">
@@ -27,7 +63,7 @@ export default function MakeReservation() {
 
               <input
                 type="datetime-local"
-                name={INPUTS.dateAndTime}
+                name={INPUTS.dateTime}
                 required
                 className="input w-full input-sm input-bordered input-primary"
               />
@@ -97,6 +133,7 @@ export default function MakeReservation() {
             </button>
             <button
               className="btn"
+              type="reset"
               onClick={() => window.make_reservation_modal.close()}
             >
               Close
