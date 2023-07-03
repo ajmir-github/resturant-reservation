@@ -1,6 +1,6 @@
 import { database } from "./config";
 import {
-  Timestamp,
+  // Timestamp,
   collection,
   deleteDoc,
   doc,
