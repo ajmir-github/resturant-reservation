@@ -1,8 +1,8 @@
 import { database } from "./config";
 import {
-  // Timestamp,
+  Timestamp,
   collection,
-  // deleteDoc,
+  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
@@ -39,19 +39,19 @@ export async function createReservation(reservation) {
   return "Reservations added!";
 }
 
-// async function updateReservation(id, entries, merge = true) {
-//   const ref = doc(database, reservationColName, id);
-//   await setDoc(ref, entries, { merge });
-//   console.log("Reservation " + (merge ? "updated!" : "overwritten!"));
-// }
+export async function updateReservation(id, entries, merge = true) {
+  const ref = doc(database, reservationColName, id);
+  await setDoc(ref, entries, { merge });
+  console.log("Reservation " + (merge ? "updated!" : "overwritten!"));
+}
 
-// async function deleteReservation(id) {
-//   const ref = doc(database, reservationColName, id);
-//   await deleteDoc(ref);
-//   console.log("Reservation deleted!");
-// }
+export async function deleteReservation(id) {
+  const ref = doc(database, reservationColName, id);
+  await deleteDoc(ref);
+  console.log("Reservation deleted!");
+}
 
-export async function trackChanges(onChange) {
+export function trackChanges(onChange) {
   const unsubscribe = onSnapshot(reservationRef, (querySnapshot) => {
     const reservations = [];
     querySnapshot.forEach((doc) => {
@@ -60,7 +60,7 @@ export async function trackChanges(onChange) {
     onChange(reservations);
   });
 
-  return unsubscribe;
+  return () => unsubscribe();
 }
 
 // export async function test() {
