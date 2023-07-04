@@ -63,6 +63,10 @@ export function trackChanges(onChange) {
   return () => unsubscribe();
 }
 
+// setTimeout(async()=>{
+//   console.log()
+// }, 1000)
+
 // export async function test() {
 //   // trackChanges((docs) => {
 //   //   console.log(docs);

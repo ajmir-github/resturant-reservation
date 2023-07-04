@@ -1,49 +1,18 @@
 import Reservations from "./components/reservations";
 import MakeReservation from "./components/makeReservation";
 import { useState } from "react";
-
-const themes = [
-  "dark",
-  "light",
-  "cupcake",
-  "bumblebee",
-  "emerald",
-  "corporate",
-  "synthwave",
-  "retro",
-  "cyberpunk",
-  "valentine",
-  "halloween",
-  "garden",
-  "forest",
-  "aqua",
-  "lofi",
-  "pastel",
-  "fantasy",
-  "wireframe",
-  "black",
-  "luxury",
-  "dracula",
-  "cmyk",
-  "autumn",
-  "business",
-  "acid",
-  "lemonade",
-  "night",
-  "coffee",
-  "winter",
-];
+import { THEMES } from "./utils";
 
 function App() {
   const [themeIndex, setThemeIndex] = useState(0);
   const toggleThemes = () => {
-    if (!themes[themeIndex + 1]) return setThemeIndex(0);
+    if (!THEMES[themeIndex + 1]) return setThemeIndex(0);
     setThemeIndex(themeIndex + 1);
   };
   return (
     <div
       className="flex flex-col sm:p-2 gap-2 sm:gap-4 min-h-screen"
-      data-theme={themes[themeIndex]}
+      data-theme={THEMES[themeIndex]}
     >
       <button
         className="btn btn-circle btn-secondary absolute bottom-0 left-0 m-2 sm:m-4"
@@ -64,11 +33,10 @@ function App() {
           />
         </svg>
       </button>
-      {/* <input
+      <input
         type="date"
-        name={"date"}
         className="input w-full input-bordered input-primary input-sm"
-      /> */}
+      />
       <Reservations />
       <MakeReservation />
     </div>

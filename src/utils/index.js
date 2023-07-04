@@ -1,3 +1,4 @@
-export function classes(...cls) {
-  return cls.filter(Boolean).join(" ");
-}
+import { classes } from "./classes";
+import { THEMES } from "./enums";
+
+export { classes, THEMES };
