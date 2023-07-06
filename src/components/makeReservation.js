@@ -81,7 +81,7 @@ export default function MakeReservation() {
         </svg>
       </button>
       <dialog id="make_reservation_modal" className="modal">
-        <form method="dialog" className="modal-box" onSubmit={handleSubmit}>
+        <form method="dialog" className="modal-box " onSubmit={handleSubmit}>
           <h3 className="font-bold text-lg">Make Reservations</h3>
           <div className="py-2">
             <div className="form-control w-full">
@@ -154,7 +154,7 @@ export default function MakeReservation() {
               />
             </div>
           </div>
-          <div className="modal-action">
+          <div className="modal-action ">
             {/* if there is a button in form, it will close the modal */}
             <button className="btn btn-xs sm:btn-sm btn-primary" type="submit">
               Add

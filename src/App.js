@@ -1,22 +1,25 @@
 import Reservations from "./components/reservations";
 import MakeReservation from "./components/makeReservation";
+import { useThemes } from "./hooks/useThemes";
 import { useState } from "react";
-import { THEMES } from "./utils";
+
+function getCurrentDate() {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function App() {
-  const [themeIndex, setThemeIndex] = useState(0);
-  const toggleThemes = () => {
-    if (!THEMES[themeIndex + 1]) return setThemeIndex(0);
-    setThemeIndex(themeIndex + 1);
-  };
+  const [theme, changeTheme] = useThemes();
+  const [date, setDate] = useState(getCurrentDate());
+  const hanldeDateInput = (e) => setDate(e.target.value);
+
   return (
     <div
-      className="flex flex-col sm:p-2 gap-2 sm:gap-4 min-h-screen"
-      data-theme={THEMES[themeIndex]}
+      className="flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 min-h-screen"
+      data-theme={theme}
     >
       <button
         className="btn btn-circle btn-secondary absolute bottom-0 left-0 m-2 sm:m-4"
-        onClick={toggleThemes}
+        onClick={changeTheme}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -35,9 +38,11 @@ function App() {
       </button>
       <input
         type="date"
-        className="input w-full input-bordered input-primary input-sm"
+        className="input w-full input-bordered input-primary"
+        onChange={hanldeDateInput}
+        value={date}
       />
-      <Reservations />
+      <Reservations date={date} />
       <MakeReservation />
     </div>
   );

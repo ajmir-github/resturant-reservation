@@ -6,7 +6,9 @@ import {
   doc,
   getDocs,
   onSnapshot,
+  query,
   setDoc,
+  where,
 } from "firebase/firestore";
 import { timestampToJsDate } from "./dateConvertor";
 
@@ -51,8 +53,15 @@ export async function deleteReservation(id) {
   console.log("Reservation deleted!");
 }
 
-export function trackChanges(onChange) {
-  const unsubscribe = onSnapshot(reservationRef, (querySnapshot) => {
+export function trackChanges(date, onChange) {
+  const [year, month, day] = date.split("-").map((str) => parseInt(str));
+  const filterQuery = query(
+    reservationRef,
+    where("dateTime", ">", new Date(`${year}-${month}-${day}`)),
+    where("dateTime", "<", new Date(`${year}-${month}-${day + 1}`))
+  );
+
+  const unsubscribe = onSnapshot(filterQuery, (querySnapshot) => {
     const reservations = [];
     querySnapshot.forEach((doc) => {
       reservations.push(normalizeFirebaseDoc(doc));
@@ -63,9 +72,24 @@ export function trackChanges(onChange) {
   return () => unsubscribe();
 }
 
-// setTimeout(async()=>{
-//   console.log()
-// }, 1000)
+// setTimeout(async () => {
+//   const year = 2023;
+//   const month = 7;
+//   const today = 7;
+
+//   const createDate = ({ year, month, day }) =>
+//     new Date(`${year}-${month}-${day}`);
+//   const q = query(
+//     reservationRef,
+//     where("dateTime", ">", createDate({ year, month, day: today })),
+//     where("dateTime", "<", createDate({ year, month, day: today + 1 }))
+//   );
+//   // const q = query(reservationRef, where("dateTime", ">", now));
+//   const snap = await getDocs(q);
+//   snap.docs.map(normalizeFirebaseDoc).forEach((doc) => {
+//     console.log(doc.dateTime);
+//   });
+// }, 1000);
 
 // export async function test() {
 //   // trackChanges((docs) => {
