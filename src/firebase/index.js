@@ -53,8 +53,17 @@ export async function deleteReservation(id) {
   console.log("Reservation deleted!");
 }
 
+export function inputDateToJSON(value) {
+  const [year, month, day] = value.split("-").map((str) => parseInt(str));
+  return { year, month, day };
+}
+export function JSONtoInputDate({ year, month, day }) {
+  const pair = (num) => num.toString().padStart(2, "0");
+  return `${pair(year)}-${pair(month)}-${pair(day)}`;
+}
+
 export function trackChanges(date, onChange) {
-  const [year, month, day] = date.split("-").map((str) => parseInt(str));
+  const { year, month, day } = inputDateToJSON(date);
   const filterQuery = query(
     reservationRef,
     where("dateTime", ">", new Date(`${year}-${month}-${day}`)),
