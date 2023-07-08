@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div
-      className="flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 "
+      className="flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 min-h-screen"
       data-theme={theme}
     >
       <button
