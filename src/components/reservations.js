@@ -27,10 +27,23 @@ const INPUTS = {
 };
 
 export default function Reservations({ date }) {
-  const [filter, setFilter] = useState(FILTER.all);
+  const [filter, setFilter] = useState(FILTER.pending);
   const [reservations, setReservations] = useState([]);
   const [selectedReservation, setSelectedReservation] = useState({});
   const [message, setMessage] = useState(null);
+  const [stats, setStats] = useState({ all: 0, taken: 0, pending: 0 });
+
+  useEffect(() => {
+    const allCount = reservations.length;
+    const takenCount = reservations.filter((doc) => doc.taken).length;
+    const pendingCount = allCount - takenCount;
+    setStats({
+      all: allCount,
+      taken: takenCount,
+      pending: pendingCount,
+    });
+  }, [reservations]);
+
   const popMessage = (msg) => {
     setMessage(msg);
     setTimeout(() => {
@@ -97,36 +110,36 @@ export default function Reservations({ date }) {
       <div className="tabs tabs-boxed">
         <button
           className={classes(
-            "tab  grow",
+            "tab  grow flex justify-center items-center gap-2",
             filter === FILTER.all && "tab-active"
           )}
           onClick={() => setFilter(FILTER.all)}
         >
-          All
+          All ({stats.all})
         </button>
         <button
           className={classes(
-            "tab  grow",
+            "tab  grow flex justify-center items-center gap-2",
             filter === FILTER.taken && "tab-active"
           )}
           onClick={() => setFilter(FILTER.taken)}
         >
-          Taken
+          Taken ({stats.taken})
         </button>
         <button
           className={classes(
-            "tab  grow",
+            "tab  grow flex justify-center items-center gap-2",
             filter === FILTER.pending && "tab-active"
           )}
           onClick={() => setFilter(FILTER.pending)}
         >
-          Pending
+          Pending ({stats.pending})
         </button>
       </div>
 
       {/* Reservations table */}
       <div className="overflow-x-auto">
-        <table className="table">
+        <table className="table table-sm">
           {/* head */}
           <thead>
             <tr className="">
@@ -155,11 +168,29 @@ export default function Reservations({ date }) {
                   <th>{reservation.persons}</th>
                   <td>{reservation.name}</td>
                   <td>
-                    {reservation.table}
-                    <br />
-                    {reservation.specialRequest}
-                    <br />
-                    {reservation.phoneNumber}
+                    <div className="flex flex-col">
+                      {reservation.table && (
+                        <div className="grid place-items-center">
+                          {reservation.table}
+                        </div>
+                      )}
+                      {reservation.specialRequest && (
+                        <>
+                          <div className="divider m-1 sm:m-2"></div>
+                          <div className="grid place-items-center">
+                            {reservation.specialRequest}
+                          </div>
+                        </>
+                      )}
+                      {reservation.phoneNumber && (
+                        <>
+                          <div className="divider m-1 sm:m-2"></div>
+                          <div className="grid place-items-center">
+                            {reservation.phoneNumber}
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

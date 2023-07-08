@@ -27,7 +27,7 @@ function App() {
 
   return (
     <div
-      className="flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 min-h-screen"
+      className="flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 "
       data-theme={theme}
     >
       <button
@@ -50,10 +50,7 @@ function App() {
         </svg>
       </button>
       <div className="join">
-        <button
-          className="btn btn-outline btn-secondary join-item"
-          onClick={previousDate}
-        >
+        <button className="btn btn-neutral  join-item" onClick={previousDate}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -69,14 +66,11 @@ function App() {
         </button>
         <input
           type="date"
-          className="input w-full input-bordered input-primary join-item"
+          className="input w-full  join-item text-center font-bold"
           onChange={hanldeDateInput}
           value={date}
         />
-        <button
-          className="btn btn-outline btn-secondary join-item"
-          onClick={nextDate}
-        >
+        <button className="btn btn-neutral join-item" onClick={nextDate}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
