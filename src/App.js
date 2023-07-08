@@ -31,7 +31,7 @@ function App() {
       data-theme={theme}
     >
       <button
-        className="btn btn-circle btn-secondary absolute bottom-0 left-0 m-2 sm:m-4"
+        className="btn btn-circle btn-neutral absolute bottom-0 left-0 m-2 sm:m-4 z-10"
         onClick={changeTheme}
       >
         <svg

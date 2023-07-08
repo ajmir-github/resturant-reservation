@@ -62,7 +62,7 @@ export default function MakeReservation() {
 
       {/* Make a reservation */}
       <button
-        className="btn btn-circle btn-primary absolute bottom-0 right-0 m-2 sm:m-4"
+        className="btn btn-circle btn-primary absolute bottom-0 right-0 m-2 sm:m-4 z-10"
         onClick={() => window.make_reservation_modal.showModal()}
       >
         <svg
