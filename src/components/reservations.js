@@ -1,30 +1,17 @@
 import { useEffect, useState } from "react";
-import { classes } from "../utils";
+import {
+  FILTER,
+  INPUTS,
+  InputDateTimeToFirebaseTimestamp,
+  classes,
+  jsDateToInputDateTime,
+  jsDateToTime,
+} from "../utils";
 import {
   trackChanges,
   updateReservation,
   deleteReservation,
 } from "../firebase";
-import {
-  HTMLDateTimeToFirebase,
-  jsToLocalStringTime,
-  jsDateToHTMLInput,
-} from "../firebase/dateConvertor";
-
-const FILTER = {
-  all: 1,
-  taken: 2,
-  pending: 3,
-};
-
-const INPUTS = {
-  dateTime: "dateTime",
-  persons: "persons",
-  name: "name",
-  table: "table",
-  specialRequest: "specialRequest",
-  phoneNumber: "phoneNumber",
-};
 
 export default function Reservations({ date }) {
   const [filter, setFilter] = useState(FILTER.pending);
@@ -54,12 +41,10 @@ export default function Reservations({ date }) {
     e.preventDefault();
     const form = new FormData(e.target);
     const reservation = {
-      dateTime: HTMLDateTimeToFirebase(form.get(INPUTS.dateTime)),
+      dateTime: InputDateTimeToFirebaseTimestamp(form.get(INPUTS.dateTime)),
       persons: form.get(INPUTS.persons),
-      table: form.get(INPUTS.table),
       name: form.get(INPUTS.name),
-      specialRequest: form.get(INPUTS.specialRequest),
-      phoneNumber: form.get(INPUTS.phoneNumber),
+      more: form.get(INPUTS.more),
       taken: selectedReservation.taken,
     };
 
@@ -164,34 +149,10 @@ export default function Reservations({ date }) {
                   )}
                   onClick={() => openModal(reservation)}
                 >
-                  <th>{jsToLocalStringTime(reservation.dateTime)}</th>
+                  <th>{jsDateToTime(reservation.dateTime)}</th>
                   <th>{reservation.persons}</th>
                   <td>{reservation.name}</td>
-                  <td>
-                    <div className="flex flex-col">
-                      {reservation.table && (
-                        <div className="grid place-items-center">
-                          {reservation.table}
-                        </div>
-                      )}
-                      {reservation.specialRequest && (
-                        <>
-                          <div className="divider m-1 sm:m-2"></div>
-                          <div className="grid place-items-center">
-                            {reservation.specialRequest}
-                          </div>
-                        </>
-                      )}
-                      {reservation.phoneNumber && (
-                        <>
-                          <div className="divider m-1 sm:m-2"></div>
-                          <div className="grid place-items-center">
-                            {reservation.phoneNumber}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </td>
+                  <td>{reservation.more}</td>
                 </tr>
               ))}
           </tbody>
@@ -235,13 +196,15 @@ export default function Reservations({ date }) {
                 type="datetime-local"
                 name={INPUTS.dateTime}
                 required
-                defaultValue={jsDateToHTMLInput(selectedReservation.dateTime)}
-                className="input w-full input-sm input-bordered input-primary"
+                defaultValue={jsDateToInputDateTime(
+                  selectedReservation.dateTime
+                )}
+                className="input w-full input-sm md:input-md input-bordered input-primary"
               />
             </div>
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Number of persons</span>
+                <span className="label-text">Persons</span>
               </label>
 
               <input
@@ -249,7 +212,7 @@ export default function Reservations({ date }) {
                 name={INPUTS.persons}
                 defaultValue={selectedReservation.persons}
                 required
-                className="input w-full input-sm input-bordered input-primary"
+                className="input w-full input-sm md:input-md input-bordered input-primary"
               />
             </div>
             <div className="form-control w-full">
@@ -262,43 +225,20 @@ export default function Reservations({ date }) {
                 name={INPUTS.name}
                 required
                 defaultValue={selectedReservation.name}
-                className="input w-full input-sm input-bordered input-primary"
+                className="input w-full input-sm md:input-md input-bordered input-primary"
               />
             </div>
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Table</span>
-              </label>
 
-              <input
-                type="text"
-                name={INPUTS.table}
-                defaultValue={selectedReservation.table}
-                className="input w-full input-sm input-bordered input-secondary"
-              />
-            </div>
             <div className="form-control w-full">
               <label className="label">
-                <span className="label-text">Special Request</span>
+                <span className="label-text">More</span>
               </label>
 
               <textarea
                 type="text"
-                name={INPUTS.specialRequest}
-                defaultValue={selectedReservation.specialRequest}
+                name={INPUTS.more}
+                defaultValue={selectedReservation.more}
                 className="textarea textarea-xs sm:textarea-sm w-full input-secondary"
-              />
-            </div>
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Phone Number</span>
-              </label>
-
-              <input
-                type="text"
-                name={INPUTS.phoneNumber}
-                defaultValue={selectedReservation.phoneNumber}
-                className="input w-full input-sm input-bordered input-secondary"
               />
             </div>
           </div>
@@ -331,7 +271,7 @@ export default function Reservations({ date }) {
           <div className="modal-action">
             {/* if there is a button in form, it will close the modal */}
             <button
-              className="btn btn-xs sm:btn-sm btn-primary"
+              className="btn btn-sm sm:btn-md btn-primary"
               type="reset"
               onClick={() => {
                 window.actionModal.close();
@@ -341,7 +281,7 @@ export default function Reservations({ date }) {
               {selectedReservation.taken ? "Untaken" : "Taken"}
             </button>
             <button
-              className="btn btn-xs sm:btn-sm btn-secondary"
+              className="btn btn-sm sm:btn-md btn-secondary"
               type="reset"
               onClick={() => {
                 window.actionModal.close();
@@ -351,7 +291,7 @@ export default function Reservations({ date }) {
               Edit
             </button>
             <button
-              className="btn btn-xs sm:btn-sm btn-error"
+              className="btn btn-sm sm:btn-md btn-error"
               type="reset"
               onClick={() => {
                 window.actionModal.close();
@@ -361,7 +301,7 @@ export default function Reservations({ date }) {
               Remove
             </button>
             <button
-              className="btn btn-xs sm:btn-sm "
+              className="btn btn-sm sm:btn-md "
               type="reset"
               onClick={() => window.actionModal.close()}
             >

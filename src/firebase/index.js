@@ -10,7 +10,11 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { timestampToJsDate } from "./dateConvertor";
+import {
+  firebaseTimestampToJsDateTime,
+  getCurrentDate,
+  inputDateToJSONDate,
+} from "../utils";
 
 const reservationColName = "reservations";
 
@@ -20,7 +24,7 @@ const reservationColName = "reservations";
 function normalizeFirebaseDoc(doc) {
   const id = doc.id;
   const data = doc.data();
-  const dateTime = timestampToJsDate(data.dateTime);
+  const dateTime = firebaseTimestampToJsDateTime(data.dateTime);
   return {
     ...data,
     id,
@@ -53,17 +57,8 @@ export async function deleteReservation(id) {
   console.log("Reservation deleted!");
 }
 
-export function inputDateToJSON(value) {
-  const [year, month, day] = value.split("-").map((str) => parseInt(str));
-  return { year, month, day };
-}
-export function JSONtoInputDate({ year, month, day }) {
-  const pair = (num) => num.toString().padStart(2, "0");
-  return `${pair(year)}-${pair(month)}-${pair(day)}`;
-}
-
-export function trackChanges(date, onChange) {
-  const { year, month, day } = inputDateToJSON(date);
+export function trackChanges(inputDate, onChange) {
+  const { year, month, day } = inputDateToJSONDate(inputDate);
   const filterQuery = query(
     reservationRef,
     where("dateTime", ">", new Date(`${year}-${month}-${day}`)),
@@ -80,6 +75,18 @@ export function trackChanges(date, onChange) {
 
   return () => unsubscribe();
 }
+
+// ------------ delete a week old reservations
+// setTimeout(async () => {
+//   const inputDate = getCurrentDate();
+//   const { year, month, day } = inputDateToJSONDate(inputDate);
+//   const jsDate = new Date(`${year}-${month}-${day - 1}`);
+//   const filterQuery = query(reservationRef, where("dateTime", "<", jsDate));
+//   const snap = await getDocs(filterQuery);
+//   snap.docs.map(normalizeFirebaseDoc).forEach((doc) => {
+//     console.log(doc.name);
+//   });
+// }, 1000);
 
 // setTimeout(async () => {
 //   const year = 2023;

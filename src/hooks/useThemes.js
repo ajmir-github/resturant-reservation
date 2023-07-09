@@ -1,23 +1,19 @@
 import { useState } from "react";
-import { THEMES } from "../utils";
 
 function getLocalTheme(defaultTheme) {
-  return localStorage.getItem("theme-index") || defaultTheme;
+  return localStorage.getItem("theme-dark") || defaultTheme;
 }
 function setLocalTheme(index) {
-  localStorage.setItem("theme-index", index);
+  localStorage.setItem("theme-dark", index);
 }
-export function useThemes(defaultTheme = 0) {
-  const [themeIndex, setThemeIndex] = useState(getLocalTheme(defaultTheme));
-  const setTheme = (index) => {
-    setThemeIndex(index);
-    setLocalTheme(index);
-  };
-  const toggleTheme = (props) => {
-    console.log(props);
-    if (!THEMES[themeIndex + 1]) return setTheme(defaultTheme);
-    setTheme(themeIndex + 1);
+export function useThemes(defaultTheme = false) {
+  const [theme, setTheme] = useState(getLocalTheme(defaultTheme));
+
+  const toggleTheme = (e) => {
+    const darkMode = e.target.checked;
+    setLocalTheme(darkMode);
+    setTheme(darkMode ? "dark" : "light");
   };
 
-  return [THEMES[themeIndex], toggleTheme];
+  return [theme, toggleTheme];
 }
