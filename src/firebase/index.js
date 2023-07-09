@@ -10,11 +10,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import {
-  firebaseTimestampToJsDateTime,
-  getCurrentDate,
-  inputDateToJSONDate,
-} from "../utils";
+import { firebaseTimestampToJsDateTime, inputDateToJSONDate } from "../utils";
 
 const reservationColName = "reservations";
 
