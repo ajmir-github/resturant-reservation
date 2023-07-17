@@ -4,11 +4,12 @@ import { useThemes } from "./hooks/useThemes";
 import { useState } from "react";
 import ThemeButton from "./components/themeButton";
 import DateChanger from "./components/dateChanger";
-import { getCurrentDate } from "./utils";
+import { DATE_FORMAT } from "./utils";
+import dayjs from "dayjs";
 
 function App() {
   const [theme, toggleTheme] = useThemes();
-  const [date, setDate] = useState(getCurrentDate());
+  const [date, setDate] = useState(dayjs().format(DATE_FORMAT));
 
   return (
     <div
@@ -18,7 +19,7 @@ function App() {
       <ThemeButton toggleTheme={toggleTheme} />
       <DateChanger date={date} setDate={setDate} />
       <Reservations date={date} />
-      <MakeReservation />
+      <MakeReservation date={date} />
     </div>
   );
 }

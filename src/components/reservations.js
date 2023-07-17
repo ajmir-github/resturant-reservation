@@ -12,6 +12,7 @@ import {
   updateReservation,
   deleteReservation,
 } from "../firebase";
+// import dayjs from "dayjs";
 
 export default function Reservations({ date }) {
   const [filter, setFilter] = useState(FILTER.pending);
@@ -21,6 +22,7 @@ export default function Reservations({ date }) {
   const [stats, setStats] = useState({ all: 0, taken: 0, pending: 0 });
 
   useEffect(() => {
+    // count the catagories
     const allCount = reservations.length;
     const takenCount = reservations.filter((doc) => doc.taken).length;
     const pendingCount = allCount - takenCount;
@@ -29,6 +31,49 @@ export default function Reservations({ date }) {
       taken: takenCount,
       pending: pendingCount,
     });
+
+    // deadline indicator
+    // const deadlineInterval = setInterval(() => {
+    //   const NOW = new Date();
+    //   const EXPIRE_MIN = 15;
+    //   const NTOFIFY_MIN = -5;
+    //   reservations.forEach((reservation, index) => {
+    //     if (reservation.taken) return;
+    //     const dateTime = reservations[index].dateTime;
+    //     const diff = parseInt((NOW - dateTime) / 1000 / 60);
+
+    //     if (diff > EXPIRE_MIN) {
+    //       return updateReservation(reservation.id, {
+    //         ...reservation,
+    //         taken: true,
+    //       }).then((res) => {
+    //         popMessage("Reservation expired!");
+    //       });
+    //     }
+
+    //     if (diff > NTOFIFY_MIN) {
+    //       console.log("NOTIFY", reservation.name, diff);
+    //     }
+    //     // if (diff > EXPIRE_MIN) {
+    //     //   return updateReservation(reservation.id, {
+    //     //     ...reservation,
+    //     //     taken: true,
+    //     //   }).then((res) => {
+    //     //     popMessage("Reservation expired!");
+    //     //   });
+    //     // }
+
+    //     // if (dateTime < AFTER) {
+    //     //   console.log(reservation.name, "Is close");
+    //     // }
+    //   });
+    //   // console.log(dayjs(reservations[0].dateTime).format("HH:mm"));
+    // }, 2000);
+
+    // // if no reservations
+    // const cancelDeadlineInterval = () => clearInterval(deadlineInterval);
+    // if (stats.all === 0) cancelDeadlineInterval();
+    // return cancelDeadlineInterval;
   }, [reservations]);
 
   const popMessage = (msg) => {
@@ -268,7 +313,7 @@ export default function Reservations({ date }) {
         <form method="dialog" className="modal-box">
           <h3 className="font-bold text-lg">Actions</h3>
 
-          <div className="modal-action">
+          <div className="modal-action flex justify-center flex-wrap gap-2">
             {/* if there is a button in form, it will close the modal */}
             <button
               className="btn btn-sm sm:btn-md btn-primary"

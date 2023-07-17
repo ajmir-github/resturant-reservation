@@ -1,24 +1,11 @@
-import { inputDateToJSONDate, JSONDatetoInputDate } from "../utils";
+import dayjs from "dayjs";
+import { DATE_FORMAT } from "../utils";
 
 export default function DateChanger({ date, setDate }) {
   const hanldeDateInput = (e) => setDate(e.target.value);
-
-  const nextDate = () => {
-    const jsonDate = inputDateToJSONDate(date);
-    if (jsonDate.day < 30) {
-      jsonDate.day += 1;
-    }
-    const plainDate = JSONDatetoInputDate(jsonDate);
-    setDate(plainDate);
-  };
-  const previousDate = () => {
-    const jsonDate = inputDateToJSONDate(date);
-    if (jsonDate.day > 1) {
-      jsonDate.day -= 1;
-    }
-    const plainDate = JSONDatetoInputDate(jsonDate);
-    setDate(plainDate);
-  };
+  const nextDate = () => setDate(dayjs(date).add(1, "day").format(DATE_FORMAT));
+  const previousDate = () =>
+    setDate(dayjs(date).subtract(1, "day").format(DATE_FORMAT));
 
   return (
     <div className="join">

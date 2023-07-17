@@ -65,3 +65,5 @@ export const FILTER = {
   taken: 2,
   pending: 3,
 };
+
+export const DATE_FORMAT = "YYYY-MM-DD";

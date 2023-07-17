@@ -9,13 +9,16 @@ const INPUTS = {
 
   more: "more",
 };
-export default function MakeReservation() {
+export default function MakeReservation({ date }) {
   const [message, setMessage] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
     const reservation = {
-      dateTime: InputDateTimeToFirebaseTimestamp(form.get(INPUTS.dateTime)),
+      // dateTime: InputDateTimeToFirebaseTimestamp(form.get(INPUTS.dateTime)),
+      dateTime: InputDateTimeToFirebaseTimestamp(
+        date + "T" + form.get(INPUTS.dateTime)
+      ),
       persons: form.get(INPUTS.persons),
       name: form.get(INPUTS.name),
       more: form.get(INPUTS.more),
@@ -87,7 +90,7 @@ export default function MakeReservation() {
               </label>
 
               <input
-                type="datetime-local"
+                type="time"
                 name={INPUTS.dateTime}
                 required
                 className="input w-full input-sm sm:input-md input-bordered input-primary"

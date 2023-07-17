@@ -10,7 +10,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { firebaseTimestampToJsDateTime, inputDateToJSONDate } from "../utils";
+import dayjs from "dayjs";
 
 const reservationColName = "reservations";
 
@@ -20,7 +20,7 @@ const reservationColName = "reservations";
 function normalizeFirebaseDoc(doc) {
   const id = doc.id;
   const data = doc.data();
-  const dateTime = firebaseTimestampToJsDateTime(data.dateTime);
+  const dateTime = data.dateTime.toDate();
   return {
     ...data,
     id,
@@ -54,11 +54,12 @@ export async function deleteReservation(id) {
 }
 
 export function trackChanges(inputDate, onChange) {
-  const { year, month, day } = inputDateToJSONDate(inputDate);
+  const today = new Date(dayjs(inputDate));
+  const tommorrow = new Date(dayjs(inputDate).add(1, "day"));
   const filterQuery = query(
     reservationRef,
-    where("dateTime", ">", new Date(`${year}-${month}-${day}`)),
-    where("dateTime", "<", new Date(`${year}-${month}-${day + 1}`))
+    where("dateTime", ">", today),
+    where("dateTime", "<", tommorrow)
   );
 
   const unsubscribe = onSnapshot(filterQuery, (querySnapshot) => {
