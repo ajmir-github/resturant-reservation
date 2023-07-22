@@ -1,28 +1,25 @@
 import { useState } from "react";
 import { createReservation } from "../firebase";
-import { InputDateTimeToFirebaseTimestamp } from "../utils";
+import {
+  INPUTS,
+  InputDateTimeToFirebaseTimestamp,
+  RESERVATION_STATUS,
+} from "../utils";
 
-const INPUTS = {
-  dateTime: "dateTime",
-  persons: "persons",
-  name: "name",
-
-  more: "more",
-};
 export default function MakeReservation({ date }) {
   const [message, setMessage] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
     const reservation = {
-      // dateTime: InputDateTimeToFirebaseTimestamp(form.get(INPUTS.dateTime)),
       dateTime: InputDateTimeToFirebaseTimestamp(
         date + "T" + form.get(INPUTS.dateTime)
       ),
       persons: form.get(INPUTS.persons),
       name: form.get(INPUTS.name),
+      table: form.get(INPUTS.table),
       more: form.get(INPUTS.more),
-      taken: false,
+      status: RESERVATION_STATUS.pending,
     };
 
     createReservation(reservation).then((res) => {
@@ -31,6 +28,8 @@ export default function MakeReservation({ date }) {
       setTimeout(() => {
         setMessage(null);
       }, 3000);
+
+      e.target.reset();
     });
   };
 
@@ -117,6 +116,17 @@ export default function MakeReservation({ date }) {
                 type="text"
                 name={INPUTS.name}
                 required
+                className="input w-full input-sm sm:input-md input-bordered input-primary"
+              />
+            </div>
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Table</span>
+              </label>
+
+              <input
+                type="text"
+                name={INPUTS.table}
                 className="input w-full input-sm sm:input-md input-bordered input-primary"
               />
             </div>

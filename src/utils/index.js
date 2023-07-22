@@ -57,6 +57,7 @@ export const INPUTS = {
   dateTime: "dateTime",
   persons: "persons",
   name: "name",
+  table: "table",
   more: "more",
 };
 
@@ -64,6 +65,15 @@ export const FILTER = {
   all: 1,
   taken: 2,
   pending: 3,
+  expired: 4,
 };
 
 export const DATE_FORMAT = "YYYY-MM-DD";
+
+export const RESERVATION_STATUS = {
+  pending: "PENDING",
+  taken: "TAKEN",
+  expired: "EXPIRED",
+};
+
+export const RESERVATION_STATUS_LIST = ["PENDING", "TAKEN", "EXPIRED"];

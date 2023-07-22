@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import {
+  DATE_FORMAT,
   FILTER,
   INPUTS,
   InputDateTimeToFirebaseTimestamp,
+  RESERVATION_STATUS,
   classes,
   jsDateToInputDateTime,
   jsDateToTime,
@@ -12,6 +14,7 @@ import {
   updateReservation,
   deleteReservation,
 } from "../firebase";
+import dayjs from "dayjs";
 // import dayjs from "dayjs";
 
 export default function Reservations({ date }) {
@@ -19,68 +22,84 @@ export default function Reservations({ date }) {
   const [reservations, setReservations] = useState([]);
   const [selectedReservation, setSelectedReservation] = useState({});
   const [message, setMessage] = useState(null);
-  const [stats, setStats] = useState({ all: 0, taken: 0, pending: 0 });
+  const [isClose, setIsClose] = useState([]);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
     // count the catagories
-    const allCount = reservations.length;
-    const takenCount = reservations.filter((doc) => doc.taken).length;
-    const pendingCount = allCount - takenCount;
-    setStats({
-      all: allCount,
-      taken: takenCount,
-      pending: pendingCount,
-    });
+    const numberOfReservations = reservations.length;
+    if (numberOfReservations > 0) {
+      const countStatus = (status) =>
+        reservations.filter((doc) => doc.status === status).length;
+      setStats({
+        all: numberOfReservations,
+        taken: countStatus(RESERVATION_STATUS.taken),
+        pending: countStatus(RESERVATION_STATUS.pending),
+        expired: countStatus(RESERVATION_STATUS.expired),
+      });
+    } else setStats(null);
 
     // deadline indicator
-    // const deadlineInterval = setInterval(() => {
-    //   const NOW = new Date();
-    //   const EXPIRE_MIN = 15;
-    //   const NTOFIFY_MIN = -5;
-    //   reservations.forEach((reservation, index) => {
-    //     if (reservation.taken) return;
-    //     const dateTime = reservations[index].dateTime;
-    //     const diff = parseInt((NOW - dateTime) / 1000 / 60);
+    const deadlineInterval = setInterval(() => {
+      const NOW = new Date();
+      const EXPIRE_MIN = 5;
+      const NOTIFY_MIN = -15;
+      reservations.forEach((reservation, index) => {
+        if (
+          dayjs().format(DATE_FORMAT) !== date ||
+          reservation.status === RESERVATION_STATUS.expired ||
+          reservation.status === RESERVATION_STATUS.taken
+        )
+          return console.log("NOT PASSED");
+        const diff = parseInt((NOW - reservation.dateTime) / 1000 / 60);
 
-    //     if (diff > EXPIRE_MIN) {
-    //       return updateReservation(reservation.id, {
-    //         ...reservation,
-    //         taken: true,
-    //       }).then((res) => {
-    //         popMessage("Reservation expired!");
-    //       });
-    //     }
+        if (diff >= EXPIRE_MIN) {
+          reservation.isClose = false;
+          return updateReservation(reservation.id, {
+            ...reservation,
+            status: RESERVATION_STATUS.expired,
+          }).then((res) => {
+            popMessage("Reservation expired!");
+          });
+        }
 
-    //     if (diff > NTOFIFY_MIN) {
-    //       console.log("NOTIFY", reservation.name, diff);
-    //     }
-    //     // if (diff > EXPIRE_MIN) {
-    //     //   return updateReservation(reservation.id, {
-    //     //     ...reservation,
-    //     //     taken: true,
-    //     //   }).then((res) => {
-    //     //     popMessage("Reservation expired!");
-    //     //   });
-    //     // }
+        if (diff >= NOTIFY_MIN) {
+          if (!isClose.includes(index)) setIsClose([...isClose, index]);
+        }
+      });
+    }, 5000);
 
-    //     // if (dateTime < AFTER) {
-    //     //   console.log(reservation.name, "Is close");
-    //     // }
-    //   });
-    //   // console.log(dayjs(reservations[0].dateTime).format("HH:mm"));
-    // }, 2000);
+    // if no reservations
+    const cancelDeadlineInterval = () => clearInterval(deadlineInterval);
+    return cancelDeadlineInterval;
+  }, [reservations, date, isClose]);
 
-    // // if no reservations
-    // const cancelDeadlineInterval = () => clearInterval(deadlineInterval);
-    // if (stats.all === 0) cancelDeadlineInterval();
-    // return cancelDeadlineInterval;
-  }, [reservations]);
+  const isCloseMat = (doc, index) => {
+    if (isClose.includes(index)) {
+      doc.isClose = true;
+    }
+    return doc;
+  };
+
+  const filterFunc = (doc) => {
+    switch (filter) {
+      case FILTER.expired:
+        return doc.status === RESERVATION_STATUS.expired;
+      case FILTER.taken:
+        return doc.status === RESERVATION_STATUS.taken;
+      case FILTER.pending:
+        return doc.status === RESERVATION_STATUS.pending;
+
+      default:
+        return true;
+    }
+  };
 
   const popMessage = (msg) => {
     setMessage(msg);
     setTimeout(() => {
       setMessage(null);
-    }, 2000);
+    }, 3000);
   };
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -90,7 +109,7 @@ export default function Reservations({ date }) {
       persons: form.get(INPUTS.persons),
       name: form.get(INPUTS.name),
       more: form.get(INPUTS.more),
-      taken: selectedReservation.taken,
+      status: RESERVATION_STATUS.pending,
     };
 
     updateReservation(selectedReservation.id, reservation).then(() => {
@@ -112,19 +131,12 @@ export default function Reservations({ date }) {
     window.updateReservationModal.showModal();
   };
 
-  const filterFuc = ({ taken }) => {
-    if (filter === FILTER.all) return true;
-    if (filter === FILTER.taken && taken) return true;
-    if (filter === FILTER.pending && !taken) return true;
-    return false;
-  };
-
-  const takenReservation = (taken) => {
+  const takenReservation = (status) => {
     updateReservation(selectedReservation.id, {
       ...selectedReservation,
-      taken: !taken,
+      status,
     }).then((res) => {
-      popMessage(taken ? "Reservation untaken!" : "Reservation taken!");
+      popMessage(`Reservation ${status}!`);
     });
   };
 
@@ -145,17 +157,9 @@ export default function Reservations({ date }) {
           )}
           onClick={() => setFilter(FILTER.all)}
         >
-          All ({stats.all})
+          All {stats && ` (${stats.all})`}
         </button>
-        <button
-          className={classes(
-            "tab  grow flex justify-center items-center gap-2",
-            filter === FILTER.taken && "tab-active"
-          )}
-          onClick={() => setFilter(FILTER.taken)}
-        >
-          Taken ({stats.taken})
-        </button>
+
         <button
           className={classes(
             "tab  grow flex justify-center items-center gap-2",
@@ -163,7 +167,27 @@ export default function Reservations({ date }) {
           )}
           onClick={() => setFilter(FILTER.pending)}
         >
-          Pending ({stats.pending})
+          Pending {stats && ` (${stats.pending})`}
+        </button>
+
+        <button
+          className={classes(
+            "tab  grow flex justify-center items-center gap-2",
+            filter === FILTER.taken && "tab-active"
+          )}
+          onClick={() => setFilter(FILTER.taken)}
+        >
+          Taken {stats && ` (${stats.taken})`}
+        </button>
+
+        <button
+          className={classes(
+            "tab  grow flex justify-center items-center gap-2",
+            filter === FILTER.expired && "tab-active"
+          )}
+          onClick={() => setFilter(FILTER.expired)}
+        >
+          Expired {stats && ` (${stats.expired})`}
         </button>
       </div>
 
@@ -176,27 +200,34 @@ export default function Reservations({ date }) {
               <th className=" p-2 sm:p-4">Time</th>
               <th className=" p-2 sm:p-4">People</th>
               <th className=" p-2 sm:p-4">Name</th>
+              <th className=" p-2 sm:p-4">Table</th>
               <th className=" p-2 sm:p-4">More</th>
             </tr>
           </thead>
           <tbody>
             {reservations
-              .filter(filterFuc)
+              .map(isCloseMat)
               .sort((a, b) => a.dateTime.getTime() - b.dateTime.getTime())
+              .filter(filterFunc)
               .map((reservation) => (
                 <tr
                   key={reservation.id}
                   className={classes(
                     "bg-opacity-50 cursor-pointer",
-                    reservation.taken
-                      ? "bg-red-700 hover:bg-red-800 "
-                      : "bg-green-700 hover:bg-green-800 "
+                    reservation.status === RESERVATION_STATUS.taken
+                      ? "bg-green-700 hover:bg-green-800 "
+                      : reservation.status === RESERVATION_STATUS.pending
+                      ? reservation.isClose
+                        ? "bg-yellow-700 hover:bg-yellow-800"
+                        : "bg-gray-700 hover:bg-gray-800"
+                      : "bg-red-700 hover:bg-red-800"
                   )}
                   onClick={() => openModal(reservation)}
                 >
                   <th>{jsDateToTime(reservation.dateTime)}</th>
                   <th>{reservation.persons}</th>
                   <td>{reservation.name}</td>
+                  <td>{reservation.table}</td>
                   <td>{reservation.more}</td>
                 </tr>
               ))}
@@ -273,6 +304,19 @@ export default function Reservations({ date }) {
                 className="input w-full input-sm md:input-md input-bordered input-primary"
               />
             </div>
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text">Table</span>
+              </label>
+
+              <input
+                type="text"
+                name={INPUTS.table}
+                required
+                defaultValue={selectedReservation.table}
+                className="input w-full input-sm md:input-md input-bordered input-primary"
+              />
+            </div>
 
             <div className="form-control w-full">
               <label className="label">
@@ -315,16 +359,29 @@ export default function Reservations({ date }) {
 
           <div className="modal-action flex justify-center flex-wrap gap-2">
             {/* if there is a button in form, it will close the modal */}
-            <button
-              className="btn btn-sm sm:btn-md btn-primary"
-              type="reset"
-              onClick={() => {
-                window.actionModal.close();
-                takenReservation(selectedReservation.taken);
-              }}
-            >
-              {selectedReservation.taken ? "Untaken" : "Taken"}
-            </button>
+            {selectedReservation.status !== RESERVATION_STATUS.taken ? (
+              <button
+                className="btn btn-sm sm:btn-md btn-primary"
+                type="reset"
+                onClick={() => {
+                  window.actionModal.close();
+                  takenReservation(RESERVATION_STATUS.taken);
+                }}
+              >
+                Taken
+              </button>
+            ) : (
+              <button
+                className="btn btn-sm sm:btn-md btn-primary"
+                type="reset"
+                onClick={() => {
+                  window.actionModal.close();
+                  takenReservation(RESERVATION_STATUS.pending);
+                }}
+              >
+                Pending
+              </button>
+            )}
             <button
               className="btn btn-sm sm:btn-md btn-secondary"
               type="reset"
