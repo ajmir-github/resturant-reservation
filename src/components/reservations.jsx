@@ -245,7 +245,7 @@ export default function Reservations({ date }) {
                 defaultValue={jsDateToInputDateTime(
                   selectedReservation.dateTime
                 )}
-                className="input w-full input-sm md:input-md input-bordered input-primary"
+                className="input w-full  input-bordered input-primary"
               />
             </div>
             <div className="form-control w-full">
@@ -258,7 +258,7 @@ export default function Reservations({ date }) {
                 name={INPUTS.persons}
                 defaultValue={selectedReservation.persons}
                 required
-                className="input w-full input-sm md:input-md input-bordered input-primary"
+                className="input w-full  input-bordered input-primary"
               />
             </div>
             <div className="form-control w-full">
@@ -271,7 +271,7 @@ export default function Reservations({ date }) {
                 name={INPUTS.name}
                 required
                 defaultValue={selectedReservation.name}
-                className="input w-full input-sm md:input-md input-bordered input-primary"
+                className="input w-full  input-bordered input-primary"
               />
             </div>
 
@@ -284,14 +284,14 @@ export default function Reservations({ date }) {
                 type="text"
                 name={INPUTS.more}
                 defaultValue={selectedReservation.more}
-                className="textarea textarea-xs sm:textarea-sm w-full input-secondary"
+                className="textarea  w-full input-secondary"
               />
             </div>
           </div>
           <div className="modal-action">
             {/* if there is a button in form, it will close the modal */}
             <button
-              className="btn btn-xs sm:btn-sm btn-primary"
+              className="btn  btn-primary"
               type="submit"
               onClick={() => window.updateReservationModal.close()}
             >
@@ -299,7 +299,7 @@ export default function Reservations({ date }) {
             </button>
 
             <button
-              className="btn btn-xs sm:btn-sm"
+              className="btn "
               type="reset"
               onClick={() => window.updateReservationModal.close()}
             >
@@ -317,7 +317,7 @@ export default function Reservations({ date }) {
           <div className="modal-action flex justify-center flex-wrap gap-2">
             {/* if there is a button in form, it will close the modal */}
             <button
-              className="btn btn-sm sm:btn-md btn-primary"
+              className="btn  btn-primary"
               type="reset"
               onClick={() => {
                 window.actionModal.close();
@@ -327,7 +327,7 @@ export default function Reservations({ date }) {
               {selectedReservation.taken ? "Untaken" : "Taken"}
             </button>
             <button
-              className="btn btn-sm sm:btn-md btn-secondary"
+              className="btn  btn-secondary"
               type="reset"
               onClick={() => {
                 window.actionModal.close();
@@ -337,7 +337,7 @@ export default function Reservations({ date }) {
               Edit
             </button>
             <button
-              className="btn btn-sm sm:btn-md btn-error"
+              className="btn  btn-error"
               type="reset"
               onClick={() => {
                 window.actionModal.close();
@@ -347,7 +347,7 @@ export default function Reservations({ date }) {
               Remove
             </button>
             <button
-              className="btn btn-sm sm:btn-md "
+              className="btn  "
               type="reset"
               onClick={() => window.actionModal.close()}
             >
