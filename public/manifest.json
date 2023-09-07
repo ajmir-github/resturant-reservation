@@ -1,6 +1,6 @@
 {
-  "short_name": "Davinci",
-  "name": "Davinci Napiana Reservations",
+  "short_name": "RestReservation",
+  "name": "RestReservation by Ajmir Raziqi",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#99A1B0",
-  "background_color": "#1D232A"
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }

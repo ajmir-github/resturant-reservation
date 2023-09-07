@@ -95,6 +95,7 @@ export default function Reservations({ date }) {
 
     updateReservation(selectedReservation.id, reservation).then(() => {
       popMessage("Reservation updated!");
+      setSelectedReservation({});
     });
   };
 
@@ -226,8 +227,8 @@ export default function Reservations({ date }) {
           </div>
         </div>
       )}
-      {/* edit modal */}
 
+      {/* edit modal */}
       <dialog id="updateReservationModal" className="modal">
         <form method="dialog" className="modal-box" onSubmit={handleEditSubmit}>
           <h3 className="font-bold text-lg">Edit the reservation</h3>
